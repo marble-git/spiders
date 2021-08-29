@@ -65,8 +65,8 @@ class Novel:
         novel_name = html.xpath('//h1//text()')[0]
         novel_author = html.xpath("//div[@id='info']/p[1]//text()")[0].split('：')[1]
         novel_introducton = html.xpath("//div[@id='intro']/p[1]//text()")[0].strip()
-        last_updated_chapter = html.xpath("//div[@id='info']/p[4]//text()")[1]
-        last_updated_time = html.xpath("//div[@id='info']/p[3]//text()")[0].split('：')[1]
+        # last_updated_chapter = html.xpath("//div[@id='info']/p[4]//text()")[1]
+        # last_updated_time = html.xpath("//div[@id='info']/p[3]//text()")[0].split('：')[1]
         self.novelmeta = NovelMeta(novel_name, novel_author, novel_introducton)
 
     def parse_detail(self, detail_url):
@@ -125,7 +125,7 @@ class Novel:
         with open(os.path.join(self.savepath, 'newupdate.txt'), mode='at', encoding='utf-8') as f:
             f.write('-' * 80 + '\n')
         for chapter in self.newupdate:
-            time.sleep(1)
+            time.sleep(10)
             newcontent = self.parse_detail(chapter.chapter_url)
             print(chapter, 'downloaded.')
             self.save_chapter(chapter, newcontent)
@@ -163,6 +163,7 @@ if __name__ == "__main__":
     while True:
         try:
             novel.activate()
+            time.sleep(600)
         except KeyboardInterrupt:
             print(KeyboardInterrupt, 'EXIT')
             exit()
