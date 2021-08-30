@@ -124,11 +124,17 @@ class Novel:
         下载新更新的章节"""
         with open(os.path.join(self.savepath, 'newupdate.txt'), mode='at', encoding='utf-8') as f:
             f.write('-' * 80 + '\n')
+        for chapter, newcontent in zip(self.newupdate, self.updated_chapter_content_generator()):
+            self.save_chapter(chapter, newcontent)
+
+    def updated_chapter_content_generator(self, sleeptime=1):
+        """所有新更新章节的内容的生成器
+        产出 <ChapterContent = namedtuple('ChapterContent', 'title content')>"""
         for chapter in self.newupdate:
-            time.sleep(10)
+            time.sleep(sleeptime)
             newcontent = self.parse_detail(chapter.chapter_url)
             print(chapter, 'downloaded.')
-            self.save_chapter(chapter, newcontent)
+            yield newcontent
 
     def save_chapter(self, chapter, newcontent):
         """保存章节内容
@@ -148,17 +154,55 @@ class Novel:
         else:
             print(newcontent.title, 'save failed.')
 
+    def make_all(self):
+        """生成一个包含到目前为止所有章节的小说文本文件"""
+        chap_sep = '\n\n'
+        if not os.path.exists(path := os.path.join(self.savepath, self.novelmeta.name + '.txt')):
+            # 未创建汇总文件时
+            # 创建汇总文件，并写入小说元信息，所有已下载章节
+            with open(path, 'wt', encoding='utf-8') as f:
+                print(f'<path> created.')
+
+                # 写入小说元信息
+                with open(os.path.join(self.savepath, 'novelmeta.txt'), 'rt', encoding='utf-8') as mf:
+                    meta = mf.read()
+                    f.write(meta)
+                    f.write(chap_sep)
+                    print('meta data writed.')
+
+                # 写入所有已下载章节
+                for chapter in self.chapters:
+                    chapter_file_name = chapter.id + chapter.title + '.txt'
+                    with open(os.path.join(self.savepath, chapter_file_name), 'rt', encoding='utf-8') as cf:
+                        chap_data = cf.read()
+                        f.write(chapter.title + '\n')
+                        f.write(chap_data)
+                        f.write(chap_sep)
+                        print(f'{chapter.title} updated to <{self.novelmeta.name}.txt>')
+        else:
+            # 如果汇总文件已创建
+            # 则将最近更新的章节追加写入到汇总文件
+            with open(path, 'at', encoding='utf-8') as f:
+                for newcontent in self.updated_chapter_content_generator():
+                    f.write(newcontent.title + '\n')
+                    f.write(newcontent.content)
+                    f.write(chap_sep)
+                    print(f'{newcontent.title} updated to <{self.novelmeta.name}.txt>')
+
     def activate(self):
         self.parse_page()
         if self.is_updated():
             self.update()
+        self.make_all()
         print('all updated.')
-        return True
 
 
 if __name__ == "__main__":
     mingzun_url = 'https://www.ibswtan.com/54/54307/'
-    save_to = r'C:\Users\MARBLE\Desktop\novels'
+    win10 = r'C:\Users\MARBLE\Desktop\novels'
+    termux = r'~/storage/shared/termuxdata/novels/'
+    kali = r'~/novels'
+    save_to = win10
     novel = Novel(mingzun_url, save_to)
     while True:
         try:
@@ -167,5 +211,6 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             print(KeyboardInterrupt, 'EXIT')
             exit()
-        except:
-            pass
+        except Exception as e:
+            print("Unexpected error:", e)
+            time.sleep(30)
