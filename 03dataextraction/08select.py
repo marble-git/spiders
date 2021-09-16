@@ -28,7 +28,7 @@ if __name__ == '__main__':
     soup = BeautifulSoup(html,'lxml')
     # pprint(soup)
     # （1）通过标签名查找：
-    # pprint(soup.select('a'))
+    print(sel:=soup.select('a'),type(sel))
     # （2）通过类名查找：
     # pprint(soup.select('.sister'))
     # （3）通过id查找：
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     # from bs4.diagnose import diagnose
     # diagnose(html)
 
-    print([tag.attrs['href'] for tag in soup.select('a')])
-    print(re.findall(r'<a(.*)</a>',soup.decode('utf-8'),re.S))
-    print(type(soup.decode()))
+    # print([tag.attrs['href'] for tag in soup.select('a')])
+    # print(re.findall(r'<a(.*)</a>',soup.decode('utf-8'),re.S))
+    # print(type(soup.decode()))
     pass
