@@ -160,7 +160,7 @@ class Comment(PreformattedString):
 + `descendants`:返回所有**子孙节点的 迭代器**
 
 
-### string,strings,stripped_strings 属性
+### string,strings,stripped_strings 属性 以及get_text()方法
         
 + `string`:
     - 如果此元素有一个子字符串，则返回值为该字符串;
@@ -180,6 +180,10 @@ class Comment(PreformattedString):
     - `_all_strings(self, strip=False, types=(NavigableString, CData))`
     - `_all_strings(True)`
     - 返回某个**标签(tag)下的所有字符串的生成器(去掉空白字符;空行;头尾的空格,换行)**
++ `get_text(self, separator="", strip=False, types=(NavigableString, CData))`
+    - `getText = get_text`
+    - `text = property(get_text)`
+    - 返回某个**标签(tag)下的所有字符串**
 
 ## find,find_all 方法
 
@@ -227,9 +231,87 @@ class Comment(PreformattedString):
     href = a.attrs.get('href')
     ```  
    
+## CSS选择器：
+
+### select方法：
+
+使用以上 `find` `find_all`方法可以方便的找出元素。但有时候使用`css`选择器的方式可以更加的方便。使用`css`选择器的语法，应该使用`select`方法。以下列出几种常用的`css`选择器方法：
+
+#### （1）通过标签名查找：
++ 选择多个tag 用 逗号分隔
+```python
+print(soup.select('a'))
+print(soup.select('title , a'))
+```
+
+#### （2）通过类名查找：
+
+通过类名，则应该在类的前面加一个`.`。比如要查找`class=sister`的标签。示例代码如下：
+
+```python
+print(soup.select('.sister'))
+```
+
+#### （3）通过id查找：
+
+通过id查找，应该在id的名字前面加一个＃号。示例代码如下：
+
+```python
+print(soup.select("#link1"))
+```
+
+#### （4）组合查找：
+
+组合查找即和写 class 文件时，标签名与类名、id名进行的组合原理是一样的，例如查找 p 标签中，id 等于 link1的内容，二者需要用空格分开：
+
+```python
+print(soup.select("p #link1"))
+```
+
+直接子标签查找，则使用 > 分隔：
+
+```python
+print(soup.select("head > title"))
+```
+
+#### （5）通过属性查找：
+
+查找时还可以加入属性元素，属性需要用中括号括起来，注意属性和标签属于同一节点，所以中间不能加空格，否则会无法匹配到。示例代码如下：
+
+```python
+print(soup.select('a[href="http://example.com/elsie"]'))
+pprint(soup.select('a#link2'))
+```
+
+#### （6）获取内容
+
+以上的 select 方法返回的结果都是列表形式，可以遍历形式输出，然后用 get_text() 方法来获取它的内容。
+`getText=get_text`
+`text = property(get_text)`
+```python
+soup = BeautifulSoup(html, 'lxml')
+print(type(soup.select('title')))
+print(soup.select('title')[0].get_text())
+
+for title in soup.select('title'):
+    print(title.get_text())
+```
 
 
+#### （7）兄弟选择器
++ `+`:用于选择紧跟目标标签之后的第一个兄弟标签
++ `~`:会选择目标标签之后所有兄弟标签
 
+```python
+    rst = soup.select('p>#link1 + a')
+    rst = soup.select('p>#link1 ~ a')
+```
+
+#### （8）按tag包含的内容选择
+
+```python
+    rst = soup.select('a:-soup-contains("some text")')
+```
 
 
 
