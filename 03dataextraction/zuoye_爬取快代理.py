@@ -164,7 +164,7 @@ if __name__ == '__main__':
     wandou = Website(name="豌豆HTTP",
                      base_url="https://h.wandouip.com/?page={}#sec3",
                      urls=(1,11,1),
-                     tags="""table tr:not(first-of-type)""",
+                     tags="""table tr ~ tr""",
                      attr_tags=[
                          """td:nth-child(1)""",
                          "aa",
@@ -176,7 +176,7 @@ if __name__ == '__main__':
                      ])
 
     sites = [
-        kuaidaili,
+        # kuaidaili,
         wandou
     ]
     for site in sites:
